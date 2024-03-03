@@ -15,6 +15,8 @@ import (
 
 var (
 	ErrorInvalidCredentials = errors.New("invalid credentional")
+	ErrorAppID = errors.New("app id is unvalue")
+	ErrorUserExist = errors.New("user already exist")
 )
 
 // Auth сервис аунтетификации
@@ -115,6 +117,10 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email, password string) ( in
 
 	passHash ,err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
+		if errors.Is(err, storage.ErrUserExist) {
+			a.log.Warn("app id not found", err)
+			return 0, fmt.Errorf("%s: %w", op, ErrorUserExist)
+		}
 		log.Error("failed to get password hash: ", err)
 		return 0, fmt.Errorf("%s %w", op, err)
 	}
@@ -141,6 +147,11 @@ func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 
 	isAdmin, err := a.usrProvider.IsAdmin(ctx, userID)
 	if err != nil {
+		if errors.Is(err, storage.ErrAppNotFound) {
+			a.log.Warn("app id not found", err)
+			return false, fmt.Errorf("%s: %w", op, ErrorAppID)
+		}
+
 		log.Error("is admin failed: ", err)
 		return false, fmt.Errorf("%s %w", op, err)
 	}
