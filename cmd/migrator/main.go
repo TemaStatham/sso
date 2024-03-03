@@ -18,8 +18,6 @@ func main() {
 	flag.StringVar(&migrationTable, "migration-table", "migrations", "name of migration table")
 	flag.Parse()
 
-	
-
 	if storagePath == "" {
 		panic("storage path is empty")
 	}
@@ -32,10 +30,10 @@ func main() {
 		"file://"+migraionPath,
 		fmt.Sprintf("sqlite3://%s?x-migrations-table=%s", storagePath, migrationTable),
 	)
-	
+
 	if err != nil {
 		panic(err)
-	}	
+	}
 
 	if err := m.Up(); err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {

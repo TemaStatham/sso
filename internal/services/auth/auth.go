@@ -15,8 +15,8 @@ import (
 
 var (
 	ErrorInvalidCredentials = errors.New("invalid credentional")
-	ErrorAppID = errors.New("app id is unvalue")
-	ErrorUserExist = errors.New("user already exist")
+	ErrorAppID              = errors.New("app id is unvalue")
+	ErrorUserExist          = errors.New("user already exist")
 )
 
 // Auth сервис аунтетификации
@@ -28,7 +28,7 @@ type Auth struct {
 	tokenTTL    time.Duration
 }
 
-// UserSaver интерфейс сохранения пользователя 
+// UserSaver интерфейс сохранения пользователя
 type UserSaver interface {
 	SaveUser(ctx context.Context, email string, passHash []byte) (ui int64, err error)
 }
@@ -61,7 +61,7 @@ func New(
 	}
 }
 
-// Login 
+// Login
 func (a *Auth) Login(ctx context.Context, email, password string, appID int) (string, error) {
 	const op = "auth.Login"
 
@@ -102,10 +102,10 @@ func (a *Auth) Login(ctx context.Context, email, password string, appID int) (st
 	}
 
 	return token, nil
-}	
+}
 
 // Register
-func (a *Auth) RegisterNewUser(ctx context.Context, email, password string) ( int64,  error) {
+func (a *Auth) RegisterNewUser(ctx context.Context, email, password string) (int64, error) {
 	const op = "auth.RegisterNewUser"
 
 	log := a.log.With(
@@ -115,7 +115,7 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email, password string) ( in
 
 	log.Info("registering user")
 
-	passHash ,err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	passHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserExist) {
 			a.log.Warn("app id not found", err)
@@ -125,7 +125,7 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email, password string) ( in
 		return 0, fmt.Errorf("%s %w", op, err)
 	}
 
-	id, err  := a.usrSaver.SaveUser(ctx, email, passHash)
+	id, err := a.usrSaver.SaveUser(ctx, email, passHash)
 	if err != nil {
 		log.Error("failed to save user: ", err)
 	}
