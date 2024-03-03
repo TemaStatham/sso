@@ -8,6 +8,8 @@ import (
 
 	"github.com/TemaStatham/sso/internal/app"
 	"github.com/TemaStatham/sso/internal/config"
+	authservice "github.com/TemaStatham/sso/internal/services/auth"
+	authstorage "github.com/TemaStatham/sso/internal/storage/sqlite"
 )
 
 // go run ./cmd/sso/main.go --config="./config/config.yaml"
@@ -22,8 +24,12 @@ func main() {
 	cfg := config.MustLoad()
 	log := setupLogger(cfg.Env)
 	log.Info("starting application", slog.Any("cfg", cfg))
-
-	application := app.New(log, cfg.GRPC.Port, cfg.StoragePaths, cfg.TokenTTL)
+	storage, err := authstorage.New(cfg.StoragePaths)
+	if err != nil {
+		panic(err)
+	}
+	service := authservice.New(log, storage,storage,storage,cfg.TokenTTL)
+	application := app.New(log, cfg.GRPC.Port, cfg.StoragePaths, cfg.TokenTTL, service)
 	go application.GRPCSrv.MustRun()
 
 	stop := make(chan os.Signal, 1)
