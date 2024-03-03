@@ -35,13 +35,12 @@ func MustLoad() *Config {
 
 	var cfg Config
 
-	if err :=cleanenv.ReadConfig(path, &cfg); err != nil {
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
 		panic("failed to read config" + err.Error())
 	}
 
 	return &cfg
 }
-
 
 // fetchConfigFlags получает путь до конфига либо из флага командной строки либо через переменную окружения
 func fetchConfigFlags() string {
