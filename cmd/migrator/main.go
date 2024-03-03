@@ -1,4 +1,4 @@
-package migrator
+package main
 
 import (
 	"errors"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
@@ -15,6 +17,8 @@ func main() {
 	flag.StringVar(&migraionPath, "migration-path", "", "path to migration")
 	flag.StringVar(&migrationTable, "migration-table", "migrations", "name of migration table")
 	flag.Parse()
+
+	
 
 	if storagePath == "" {
 		panic("storage path is empty")
@@ -26,7 +30,7 @@ func main() {
 
 	m, err := migrate.New(
 		"file://"+migraionPath,
-		fmt.Sprintf("sqlite3://%s?x=migrations-table=%s", storagePath, migrationTable),
+		fmt.Sprintf("sqlite3://%s?x-migrations-table=%s", storagePath, migrationTable),
 	)
 	
 	if err != nil {
